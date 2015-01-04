@@ -257,7 +257,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				if(frame.end - .5 < currentTime)
 					if(Player.Video.flag) {
 						Player.check(frame.end);
-						console.log('proxodit');
 						Player.Video.flag = false;
 					}
 			}
