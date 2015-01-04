@@ -1,3 +1,57 @@
+function p(s){ // parse for '//'
+	var org = s;
+	var a = s.split(' ');
+	var res = '';
+	for(d in a){
+		var t = a[d];
+
+		if(t!==''){
+		// console.log(t);
+		if(t.search(/\/\//)!==-1){
+			t = t.slice(0, t.search(/\/\/\/\//)-1);
+		}
+		if(t.search(/\/\/\/\//)!==-1){
+			t = t.slice(0, t.search(/\/\/\/\//)-1);
+		}
+		if(t.search(/\/[^\/]+\//)!==-1){
+			t = t.replace('\/', '<u>');
+			t = t.replace('\/', '</u>');
+		}
+			res += t + ' ';
+		} else {
+			res += ' ';
+		}
+	}
+	if(res.search(/\/[^u]/)!==-1){
+		// console.log('in');
+		var check = true;
+		for(var j=0;j<5;j++){
+			if(res.search(/\/[^u]/)!==-1){
+				if(check){
+					var s = res.search(/\/[^u]/);
+					var left = res.slice(0, s);
+					var slash = res.slice(s,s+1);
+					var right = res.substr(s+1);
+
+					slash = '<u>';
+					res = left + slash + right;
+					check = false;
+				} else {
+					var s = res.search(/\/[^u]/);
+					var left = res.slice(0, s);
+					var slash = res.slice(s,s+1);
+					var right = res.substr(s+1);
+
+					slash = '</u>';
+					res = left + slash + right;
+					check = true;
+				}
+			}
+		}
+	}
+	return res;
+}
+
 function getSubs(path, path_voice, call){
 	function getXmlHttp(){
 		var xmlhttp;
@@ -34,7 +88,8 @@ function getSubs(path, path_voice, call){
 function video(video, audio, coords, subs, cpan, tline, volume ) {
 	getSubs(coords[0], coords[1], function(r) {
 		var Player = {
-			i: -1,
+			i: null,
+			counter: null,
 			Subs: {
 				Models: {},
 				Views: {},
@@ -59,6 +114,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			next : function() {
 				if(Player.i != Player.Coords.Video.length - 1)
 					this.set('counter', this.get('counter') + 1);
+			},
+			setCount: function(n) {
+				this.set('counter', n);
 			},
 			prev : function() {
 				if(Player.i > 0)
@@ -88,7 +146,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			},
 			check: function(framend) {
 				Player.Video.interval = setInterval(function() {
-					console.log('check');
 					if(Player.Video.el.currentTime >= framend) {
 						Player.Main.MainModel.next();
 
@@ -108,12 +165,14 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			Player.Main.Collections.ModelsCollection = new mainCollection();
 			Player.Main.Models.Main = Backbone.Model.extend({
 				defaults: {
-					counter:-1,
+					counter: Player.counter,
 					next: false,
-					prev: false
+					prev: false,
+					setCount: false
 				},
 				next : function() {
 					if(Player.i != Player.Coords.Video.length - 1) {
+						this.set('setCount', false);
 						this.set('prev', false);
 						this.set('next', true);
 						Player.next.call(this);
@@ -122,11 +181,18 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				},
 				prev : function() {
 					if(Player.i > 0) {
+						this.set('setCount', false);
 						this.set('next', false);
 						this.set('prev', true);
 						Player.prev.call(this);
 						Player.i--;
 					}
+				},
+				setCount: function(n) {
+					this.set('next', false);
+					this.set('prev', false);
+					this.set('setCount', true);
+					Player.setCount.call(this, n);
 				}
 			});
 			var main = new Player.Main.Models.Main();
@@ -143,6 +209,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 						}
 						else if(self.model.get('prev')) {
 							m.prev();
+						}
+						else if(self.model.get('setCount')) {
+							m.setCount(0);
 						}
 					});
 				}
@@ -178,11 +247,12 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			//subs model
 			Player.Subs.Models.Main = Backbone.Model.extend({
 				defaults: {
-					counter: -1,
+					counter: Player.counter,
 					subs: []
 				},
 				next: Player.next,
-				prev: Player.prev
+				prev: Player.prev,
+				setCount: Player.setCount
 			});
 			//new subs model
 			var subsModel = new Player.Subs.Models.Main();
@@ -212,7 +282,10 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					this.model.on('change:data', this.render, this)
 				},
 				render : function() {
-					this.$el.html(this.model.get('data')[this.model.get('index')]);
+					if(this.model.get('index') == 2 || this.model.get('index') == 3) {
+						this.$el.html(p(this.model.get('data')[this.model.get('index')]));
+					} else
+						this.$el.html(this.model.get('data')[this.model.get('index')]);
 				}
 			});
 
@@ -236,8 +309,10 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 
 
 				if(Player.Video.el.paused) {
-					if(Player.i === -1)
-						Player.Main.MainModel.next();
+					if(Player.i === null) {
+						Player.Main.MainModel.setCount(0);
+						Player.i = 0;
+					}
 					Player.Video.autopause = false;
 					Player.Video.el.play();
 				}
@@ -284,10 +359,11 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 
 			//next
 			$('#' + cpan[7]).click(function() {
-
 				clearInterval(Player.Video.interval);
-				if(Player.i === -1)
-					Player.Main.MainModel.next();
+				if(Player.i === null) {
+					Player.Main.MainModel.setCount(0);
+					Player.i = 0;
+				}
 
 				if(Player.Video.el.paused) {  // paused
 					Player.Video.el.play();
@@ -300,11 +376,22 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Player.Video.autopause = true;
 				Player.Video.flag = true;
 			});
+
+		})();
+
+		(function() {
+			//stop
+			$('#' + cpan[4]).click(function() {
+				Player.Video.el.currentTime = 0;
+				Player.Video.el.pause();
+				Player.Main.MainModel.setCount(0);
+				Player.i = 0;
+			})
 		})();
 
 
 	});//getSubs
-
+	
 	// setInterval(function(){
 	// 	Player.Main.MainModel.changeCounter();
 	// 	console.log(Player.i);
