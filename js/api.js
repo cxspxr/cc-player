@@ -95,7 +95,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 							Player.Video.el.pause();
 
 						Player.Video.flag = true;
-
+						console.log('vnutr');
 						clearInterval(Player.Video.interval);
 					}
 				},10);
