@@ -286,7 +286,8 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			$('#' + cpan[7]).click(function() {
 
 				clearInterval(Player.Video.interval);
-
+				if(Player.i === -1)
+					Player.Main.MainModel.next();
 
 				if(Player.Video.el.paused) {  // paused
 					Player.Video.el.play();
