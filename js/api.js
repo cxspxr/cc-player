@@ -88,14 +88,13 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			},
 			check: function(framend) {
 				Player.Video.interval = setInterval(function() {
+					console.log('check');
 					if(Player.Video.el.currentTime >= framend) {
 						Player.Main.MainModel.next();
 
 						if(Player.Video.autopause)
 							Player.Video.el.pause();
-
 						Player.Video.flag = true;
-						console.log('vnutr');
 						clearInterval(Player.Video.interval);
 					}
 				},10);
@@ -254,11 +253,12 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				// 	Player.Main.MainModel.next();
 
 				//autopause flag
-				if(frame.end - .5 < currentTime)
+				if(frame.end - .5 < currentTime) {
 					if(Player.Video.flag) {
-						Player.check(frame.end);
 						Player.Video.flag = false;
+						Player.check(frame.end);
 					}
+				}
 			}
 		})();
 		
@@ -297,6 +297,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					Player.Video.el.pause();
 				}
 				Player.Video.autopause = true;
+				Player.Video.flag = true;
 			});
 		})();
 
