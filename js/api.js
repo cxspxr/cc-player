@@ -111,9 +111,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				interval: null,
 				flag: true
 			},
-			timeline: new timeline(tline[1], tline[0], function(a) {
-				Player.Video.el.currentTime = Player.Video.el.duration * parseFloat(a)/100;
-			}, 'prcnts', 0),
 			next : function() {
 				if(Player.i != Player.Coords.Video.length - 1)
 					this.set('counter', this.get('counter') + 1);
@@ -121,13 +118,18 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			setCount: function(n) {
 				this.set('counter', n);
 			},
+			timeline: new timeline(tline[1], tline[0], function(a) {
+				Player.Video.el.currentTime = Player.Video.el.duration * parseFloat(a)/100;
+				_.each(Player.Coords.Video, function(el, i) {
+				});
+			}, 'prcnts', 0),
 			prev : function() {
 				if(Player.i > 0)
 				{
 					this.set('counter', this.get('counter') - 1);
 				}
 			},
-			frame: function(i) {
+			frame: function(i, coords) {
 				function toSec(str){
 					var str = str.split(':'),
 					h = parseInt(str[0]),
@@ -139,7 +141,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					h > 0 && m === 0 ? h * 3600 + s : 
 					h > 0 && m > 0 ? h * 3600 + m * 60 + s : false;
 				}
-				var subline = Player.Coords.Video[i ? i : Player.i];
+				var subline = coords ? coords : Player.Coords.Video[i ? i : Player.i];
 				var frameStr = subline[0];
 				var frame = {
 					start: toSec(frameStr.split(' --> ')[0]),
@@ -392,6 +394,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 		(function() {
 			//stop
 			$('#' + cpan[4]).click(function() {
+				Player.timeline.goTo('%', 0);
 				Player.Video.el.currentTime = 0;
 				Player.Video.el.pause();
 				Player.Main.MainModel.setCount(0);
