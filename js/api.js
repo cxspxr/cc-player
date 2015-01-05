@@ -125,7 +125,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					var frame = Player.frame(i);
 					if(Player.Video.el.currentTime > frame.start && Player.Video.el.currentTime < frame.end) {
 						Player.Main.MainModel.setCount(i);
-						console.log(i);
 					}
 				});
 			}, 'prcnts', 0),
@@ -147,7 +146,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					h > 0 && m === 0 ? h * 3600 + s : 
 					h > 0 && m > 0 ? h * 3600 + m * 60 + s : false;
 				}
-				var subline = Player.Coords.Video[i ? i : Player.i];
+				var subline = Player.Coords.Video[i || i == 0 ? i : Player.i];
 				var frameStr = subline[0];
 				var frame = {
 					start: toSec(frameStr.split(' --> ')[0]),
@@ -159,7 +158,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Player.Video.interval = setInterval(function() {
 					if(Player.Video.el.currentTime >= framend) {
 						Player.Main.MainModel.next();
-
 						if(Player.Video.autopause)
 							Player.Video.el.pause();
 						Player.Video.flag = true;
@@ -332,6 +330,8 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 
 
 			Player.Video.el.ontimeupdate = function() {
+				if(Player.i === null)
+					return;
 				var currentTime = this.currentTime;
 				var frame = Player.frame();
 				// if(frame.end < currentTime)
