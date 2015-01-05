@@ -577,6 +577,13 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			}
 		})();
 
+		//autext
+		$('#' + cpan[2]).change(function() {
+			if(this.checked)
+				Player.Text.Views.LineMain.$el.fadeIn();
+			else
+				Player.Text.Views.LineMain.$el.fadeOut();
+		});
 
 
 	});//getSubs
