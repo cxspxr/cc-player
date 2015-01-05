@@ -121,6 +121,11 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			timeline: new timeline(tline[1], tline[0], function(a) {
 				Player.Video.el.currentTime = Player.Video.el.duration * parseFloat(a)/100;
 				_.each(Player.Coords.Video, function(el, i) {
+					var frame = Player.frame(i);
+					if(Player.Video.el.currentTime > frame.start && Player.Video.el.currentTime < frame.end) {
+						Player.i = i;
+						Player.Main.MainModel.setCount(i);
+					}
 				});
 			}, 'prcnts', 0),
 			prev : function() {
@@ -129,7 +134,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					this.set('counter', this.get('counter') - 1);
 				}
 			},
-			frame: function(i, coords) {
+			frame: function(i) {
 				function toSec(str){
 					var str = str.split(':'),
 					h = parseInt(str[0]),
@@ -141,7 +146,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					h > 0 && m === 0 ? h * 3600 + s : 
 					h > 0 && m > 0 ? h * 3600 + m * 60 + s : false;
 				}
-				var subline = coords ? coords : Player.Coords.Video[i ? i : Player.i];
+				var subline = Player.Coords.Video[i ? i : Player.i];
 				var frameStr = subline[0];
 				var frame = {
 					start: toSec(frameStr.split(' --> ')[0]),
@@ -216,7 +221,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 							m.prev();
 						}
 						else if(self.model.get('setCount')) {
-							m.setCount(0);
+							m.setCount(Player.i);
 						}
 					});
 				}
