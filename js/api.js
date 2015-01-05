@@ -156,7 +156,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			},
 			check: function(framend) {
 				Player.Video.interval = setInterval(function() {
+					console.log(framend + "  f  " + Player.Video.el.currentTime);
 					if(Player.Video.el.currentTime >= framend) {
+						console.log('CATCH ' + framend + "  f  " + Player.Video.el.currentTime);
 						Player.Main.MainModel.next();
 						if(Player.Video.autopause)
 							Player.Video.el.pause();
@@ -167,6 +169,12 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			}
 		};
 
+
+		//duration
+		Player.Video.el.onloadedmetadata = function() {
+			var duration = this.duration;
+			$('#' + tline[3]).html(parseInt(duration/60) + ":" + parseInt(duration%60));
+		};
 
 		//Player.Main
 		(function() {
@@ -344,6 +352,12 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 						Player.check(frame.end);
 					}
 				}
+
+				//timespend
+				var time = Player.Video.el.currentTime;
+				$('#' + tline[2]).html(time > 60 ? '0' + parseInt(time/60) + ':' + (parseInt(time%60)<10
+				?'0'+parseInt(time%60):parseInt(time%60)) : time < 10 
+				? '00:' + '0' + parseInt(time) : '00:' + parseInt(time));
 
 				//goTo timeline
 				Player.timeline.goTo('%', Player.Video.el.currentTime/Player.Video.el.duration * 100);

@@ -17,7 +17,7 @@
 				<div class="timeline" id="timelineId">
 					<div id="inTimeline" class="in-timeline"></div>
 					<div id="time">
-						<div id="timeSpend"></div>
+						<div id="timeSpend">00:00</div>
 						<div id="videoDur"></div>
 					</div>
 					<div id="volume">
