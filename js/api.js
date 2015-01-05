@@ -105,6 +105,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Collections:{},
 				MainModel: {}
 			},
+			Audio: {
+				el: document.getElementById(audio)
+			},
 			Video: {
 				el: document.getElementById(video),
 				autopause: false,
@@ -134,7 +137,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					this.set('counter', this.get('counter') - 1);
 				}
 			},
-			frame: function(i) {
+			frame: function(i, audio) {
 				function toSec(str){
 					var str = str.split(':'),
 					h = parseInt(str[0]),
@@ -146,7 +149,8 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					h > 0 && m === 0 ? h * 3600 + s : 
 					h > 0 && m > 0 ? h * 3600 + m * 60 + s : false;
 				}
-				var subline = Player.Coords.Video[i || i == 0 ? i : Player.i];
+				var subline = audio ? Player.Coords.Audio[i || i == 0 ? i : Player.i] 
+					: Player.Coords.Video[i || i == 0 ? i : Player.i];
 				var frameStr = subline[0];
 				var frame = {
 					start: toSec(frameStr.split(' --> ')[0]),
@@ -156,9 +160,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			},
 			check: function(framend) {
 				Player.Video.interval = setInterval(function() {
-					console.log(framend + "  f  " + Player.Video.el.currentTime);
+					// console.log(framend + "  f  " + Player.Video.el.currentTime);
 					if(Player.Video.el.currentTime >= framend) {
-						console.log('CATCH ' + framend + "  f  " + Player.Video.el.currentTime);
+						// console.log('CATCH ' + framend + "  f  " + Player.Video.el.currentTime);
 						Player.Main.MainModel.next();
 						if(Player.Video.autopause)
 							Player.Video.el.pause();
@@ -324,7 +328,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 
 				clearInterval(Player.Video.interval);
 
-
 				if(Player.Video.el.paused) {
 					if(Player.i === null) {
 						Player.Main.MainModel.setCount(0);
@@ -334,6 +337,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				}
 				else
 					Player.Video.el.pause();
+
+				Player.Audio.el.pause();
+
 			});
 
 
@@ -352,6 +358,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 						Player.check(frame.end);
 					}
 				}
+
 
 				//timespend
 				var time = Player.Video.el.currentTime;
@@ -382,6 +389,8 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					Player.Video.el.currentTime = frame.start;
 					Player.Video.el.pause();
 				}
+
+				Player.Audio.el.pause();
 			});
 
 			//next
@@ -402,6 +411,8 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				}
 				Player.Video.autopause = true;
 				Player.Video.flag = true;
+				
+				Player.Audio.el.pause();
 			});
 
 		})();
@@ -413,12 +424,33 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Player.Video.el.currentTime = 0;
 				Player.Video.el.pause();
 				Player.Main.MainModel.setCount(0);
+				
+				Player.Audio.el.pause();
 			})
 		})();
 
-		//timeline
+		//say
 		(function() {
+			$('#' + cpan[5]).click(function() {
+				Player.Video.el.pause();
+
+				if(Player.i === null) {
+					var frame = Player.frame(0, 'audio');
+					Player.Main.MainModel.setCount(0);
+				}
+				else
+					var frame = Player.frame(false, 'audio');
+				Player.Audio.el.currentTime = frame.start;
+
+				Player.Audio.el.play();	
+
+			});
+
+			Player.Audio.el.ontimeupdate = function() {
+				var frame = Player.frame(false, 'audio');
+			}
 		})();
+
 
 
 	});//getSubs
