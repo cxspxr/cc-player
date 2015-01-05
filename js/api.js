@@ -506,9 +506,12 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 
 			//next
 			$('#' + cpan[7]).click(function() {
+				Player.Audio.el.pause();
 				clearInterval(Player.Video.interval);
-				if(Player.i == Player.Coords.Video.length - 1)
+				if(Player.i == Player.Coords.Video.length - 1) {
+					Player.Video.el.play();
 					return;
+				}
 				if(Player.i === null) {
 					Player.Main.MainModel.setCount(0);
 				}
@@ -523,7 +526,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Player.Video.autopause = true;
 				Player.Video.flag = true;
 				
-				Player.Audio.el.pause();
 			});
 
 		})();
