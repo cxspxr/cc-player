@@ -410,8 +410,8 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			Player.Video.el.parentNode.appendChild(Player.Text.Views.LineMain.el);
 			Player.Text.Views.LineMain.render();
 
-			
-			Player.Main.Collections.ModelsCollection.add(subsModel);
+
+			Player.Main.Collections.ModelsCollection.add(Player.Text.Models.Main);
 		})();
 
 
