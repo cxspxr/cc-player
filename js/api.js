@@ -128,6 +128,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				this.set('counter', n);
 			},
 			timeline: new timeline(tline[1], tline[0], function(a) {
+				Player.Video.autopause = false;
 				Player.Video.el.currentTime = Player.Video.el.duration * parseFloat(a)/100;
 				_.each(Player.Coords.Video, function(el, i) {
 					var frame = Player.frame(i);
@@ -584,6 +585,14 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			else
 				Player.Text.Views.LineMain.$el.fadeOut();
 		});
+
+		//volume
+		(function(){
+			var vol = new timeline(volume[1], volume[0], function(a) {
+				Player.Audio.el.volume = (a/100).toFixed(1);
+				Player.Video.el.volume = (a/100).toFixed(1);
+			}, 'prcnts', 0);
+		})();
 
 
 	});//getSubs
