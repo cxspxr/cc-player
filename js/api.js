@@ -365,12 +365,20 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Player.Text.Collections.Lines.add(line);
 			});
 
-			var LineMain = Backbone.Model;
+			var LineMain = Backbone.Model.extend({
+				defaults: {
+					counter : Player.counter
+				},
+				setCount: Player.setCount,
+				next: Player.next,
+				prev: Player.prev
+			});
 			Player.Text.Models.Main = new LineMain;
 
 			var LineMainView = Backbone.View.extend({
 				initialize: function() {
-					this.model.on('change:index', this.draw, this)
+					this.model.on('change:index', this.draw, this);
+					this.model.on('change:counter', this.changer, this);
 				},
 				id: 'autext',
 				render: function() {
@@ -402,6 +410,14 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					var frame = Player.frame();
 					Player.Video.el.currentTime = frame.start;
 					Player.Audio.el.pause();
+				},
+				changer: function() {
+					this.collection.each(function(m) {
+						m.get('view').$el.css({'background-color' : 'white', 'color' : 'black'});
+					});
+
+					Player.Text.Collections.Lines.at(Player.Text.Models.Main.get('counter'))
+						.get('view').$el.css({'background-color': 'green', 'color': 'white'});
 				}
 			});
 
