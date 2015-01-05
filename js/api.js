@@ -95,6 +95,11 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Views: {},
 				Collections: {}
 			},
+			Text: {
+				Models: {},
+				Views: {},
+				Collections: {}
+			},
 			Coords: {
 				Video : r.videoSubs,
 				Audio : r.audioCoords
@@ -321,6 +326,94 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			//add main models to the Player.Main.Collections.MainModels
 			Player.Main.Collections.ModelsCollection.add(subsModel);
 		})();
+
+		//autist
+		(function() {
+
+
+			var Line = Backbone.Model.extend({
+				defaults: {
+					org : '',
+					trans: ''
+				}
+			});
+
+			var LineView = Backbone.View.extend({
+				initialize: function() {
+					this.model.set('view',this);
+					this.$el.html("<span class='au-left'>" + this.model.get('org') 
+						+ "</span>" + "<span class='au-right'>" + this.model.get('trans') 
+						+ "</span>" );
+				}
+			});
+
+			var Lines = Backbone.Collection;
+			Player.Text.Collections.Lines = new Lines;
+
+			var LinesViews = Backbone.Collection;
+			Player.Text.Collections.LinesViews = new LinesViews; 
+
+			_.each(Player.Coords.Video, function(el, i) {
+				var line = new Line({
+					org: Player.Coords.Video[i][2].replace(/\//g, '').replace(/\(/g, '').replace(/\)/g, ''),
+					trans: Player.Coords.Video[i][4]
+				});
+
+				var lineView = new LineView({model: line});
+				Player.Text.Collections.LinesViews.add(lineView);
+
+				Player.Text.Collections.Lines.add(line);
+			});
+
+			var LineMain = Backbone.Model;
+			Player.Text.Models.Main = new LineMain;
+
+			var LineMainView = Backbone.View.extend({
+				initialize: function() {
+					this.model.on('change:index', this.draw, this)
+				},
+				id: 'autext',
+				render: function() {
+					this.$el.css({'width' : Player.Video.el.width + 'px', 
+						'height' : Player.Video.el.height + 'px',
+						'background-color' : 'white', 'position' : 'absolute',
+						'display' : 'none', 'top' : '0', 'overflow-x' : 'hidden',
+						'cursor' : 'pointer'});
+					
+					var self = this;
+					this.collection.each(function(m, i, col) {
+						self.el.appendChild(m.get('view').el);
+						m.get('view').$el.click(function() {
+							var index = col.indexOf(m);
+							Player.Text.Models.Main.set('index', index);
+						});
+					});
+				},
+				draw: function() {
+					this.collection.each(function(m) {
+						m.get('view').$el.css({'background-color' : 'white', 'color' : 'black'});
+					});
+
+					Player.Text.Collections.Lines.at(Player.Text.Models.Main.get('index'))
+						.get('view').$el.css({'background-color': 'green', 'color': 'white'});
+
+
+					Player.Main.MainModel.setCount(Player.Text.Models.Main.get('index'));
+					var frame = Player.frame();
+					Player.Video.el.currentTime = frame.start;
+					Player.Audio.el.pause();
+				}
+			});
+
+			Player.Text.Views.LineMain = new LineMainView({collection: Player.Text.Collections.Lines, 
+				model: Player.Text.Models.Main});
+			Player.Video.el.parentNode.appendChild(Player.Text.Views.LineMain.el);
+			Player.Text.Views.LineMain.render();
+
+			
+			Player.Main.Collections.ModelsCollection.add(subsModel);
+		})();
+
 
 
 		//play/pause 
