@@ -116,6 +116,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					this.set('counter', this.get('counter') + 1);
 			},
 			setCount: function(n) {
+				Player.i = n;
 				this.set('counter', n);
 			},
 			timeline: new timeline(tline[1], tline[0], function(a) {
@@ -123,8 +124,8 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				_.each(Player.Coords.Video, function(el, i) {
 					var frame = Player.frame(i);
 					if(Player.Video.el.currentTime > frame.start && Player.Video.el.currentTime < frame.end) {
-						Player.i = i;
 						Player.Main.MainModel.setCount(i);
+						console.log(i);
 					}
 				});
 			}, 'prcnts', 0),
@@ -321,7 +322,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				if(Player.Video.el.paused) {
 					if(Player.i === null) {
 						Player.Main.MainModel.setCount(0);
-						Player.i = 0;
 					}
 					Player.Video.autopause = false;
 					Player.Video.el.play();
@@ -377,7 +377,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					return;
 				if(Player.i === null) {
 					Player.Main.MainModel.setCount(0);
-					Player.i = 0;
 				}
 				if(Player.Video.el.paused) {  // paused
 					Player.Video.el.play();
@@ -386,12 +385,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					var frame = Player.frame();
 					Player.Video.el.currentTime = frame.start;
 					Player.Video.el.pause();
-					console.log(frame.start);
 				}
 				Player.Video.autopause = true;
 				Player.Video.flag = true;
-				console.log(Player.i + " " +  Player.Main.MainModel.get('counter') 
-				+ " " +  Player.Video.el.currentTime);
 			});
 
 		})();
@@ -403,7 +399,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Player.Video.el.currentTime = 0;
 				Player.Video.el.pause();
 				Player.Main.MainModel.setCount(0);
-				Player.i = 0;
 			})
 		})();
 
