@@ -3,15 +3,16 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 	<div class="container">
 		<div class="video-container" id="videoContainer">
 			<video id="video" preload="auto" width="700" height="360">
 			
-				<source src="yt/yt_small.mp4" type='video/mp4' />
+				<source src="abba/ABBA.mp4" type='video/mp4' />
 			</video>
-			<audio src="yt/yt_voice.mp3" preload id="voice"></audio>
+			<audio src="abba/ABBA_voice.mp3" preload id="voice"></audio>
 			<div class="panel">
 				<div class="timeline" id="timelineId">
 					<div id="inTimeline" class="in-timeline"></div>

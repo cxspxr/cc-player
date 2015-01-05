@@ -111,6 +111,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				interval: null,
 				flag: true
 			},
+			timeline: new timeline(tline[1], tline[0], function(a) {
+				Player.Video.el.currentTime = Player.Video.el.duration * parseFloat(a)/100;
+			}, 'prcnts', 0),
 			next : function() {
 				if(Player.i != Player.Coords.Video.length - 1)
 					this.set('counter', this.get('counter') + 1);
@@ -334,6 +337,9 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 						Player.check(frame.end);
 					}
 				}
+
+				//goTo timeline
+				Player.timeline.goTo('%', Player.Video.el.currentTime/Player.Video.el.duration * 100);
 			}
 		})();
 		
@@ -346,7 +352,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 
 
 				if(Player.Video.el.paused) { // paused
-					if(Player.i == 0) return;
+					if(Player.i == 0 || Player.i == null) return;
 					Player.Main.MainModel.prev();
 					var frame = Player.frame();
 					Player.Video.el.currentTime = frame.start;
@@ -360,11 +366,12 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			//next
 			$('#' + cpan[7]).click(function() {
 				clearInterval(Player.Video.interval);
+				if(Player.i == Player.Coords.Video.length - 1)
+					return;
 				if(Player.i === null) {
 					Player.Main.MainModel.setCount(0);
 					Player.i = 0;
 				}
-
 				if(Player.Video.el.paused) {  // paused
 					Player.Video.el.play();
 				} else {  // played
@@ -372,9 +379,12 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					var frame = Player.frame();
 					Player.Video.el.currentTime = frame.start;
 					Player.Video.el.pause();
+					console.log(frame.start);
 				}
 				Player.Video.autopause = true;
 				Player.Video.flag = true;
+				console.log(Player.i + " " +  Player.Main.MainModel.get('counter') 
+				+ " " +  Player.Video.el.currentTime);
 			});
 
 		})();
@@ -387,6 +397,10 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Player.Main.MainModel.setCount(0);
 				Player.i = 0;
 			})
+		})();
+
+		//timeline
+		(function() {
 		})();
 
 

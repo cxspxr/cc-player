@@ -23,11 +23,13 @@
 + */
 var v = new video(
 	'video', 'voice', 
-	['yt/yt.srt','yt/yt_voice.srt'],
+	['abba/ABBA.srt','abba/ABBA_voice.srt'],
 	['crypt', 'org', 'slate', 'org2'], 
 	['controlPane', 'autopause', 'audiotext', 'play', 'stop', 'say', 'prevframe', 'nextframe'],
 	['timelineId', 'inTimeline', 'timeSpend', 'videoDur'],// айди всего таймлайна, айди пиптика, айди куда печатать пройденное время, айди дива куда печатать длительность
 	['volume', 'volumeIn']); 
+
+
 /*
 +var v2 = new video(
 +	'video2', 'voice2', 
