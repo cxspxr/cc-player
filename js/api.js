@@ -328,6 +328,31 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			Player.Main.Collections.ModelsCollection.add(subsModel);
 		})();
 
+
+
+
+		//govnokod
+		//autoscrolling
+			(function($) {
+			    $.fn.scrollTo = function() {
+			        $('#autext').animate({
+			            scrollTop: Player.Text.Models.Main.get('counter') * $(this).height() + 'px'
+			        }, 'fast');
+			        return this; // for chaining...
+	    }
+			})(jQuery);
+
+		//prevdef
+		(function() {
+			$('#autext').scroll(function(e) {
+				e.preventDefault();
+			});
+		})();
+		//govnokod
+
+
+
+
 		//autist
 		(function() {
 
@@ -413,12 +438,15 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					Player.Audio.el.pause();
 				},
 				changer: function() {
-					this.collection.each(function(m) {
-						m.get('view').$el.css({'background-color' : 'white', 'color' : 'black'});
-					});
 
-					Player.Text.Collections.Lines.at(Player.Text.Models.Main.get('counter'))
-						.get('view').$el.css({'background-color': 'green', 'color': 'white'});
+						this.collection.each(function(m) {
+							m.get('view').$el.css({'background-color' : 'white', 'color' : 'black'});
+						});
+						Player.Text.Collections.Lines.at(Player.Text.Models.Main.get('counter'))
+							.get('view').$el.css({'background-color': 'green', 'color': 'white'});
+						Player.Text.Collections.Lines.at(Player.Text.Models.Main.get('counter'))
+						.get('view').$el.scrollTo();
+
 				}
 			});
 
@@ -450,7 +478,6 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 					Player.Video.el.pause();
 
 				Player.Audio.el.pause();
-
 			});
 
 
@@ -479,6 +506,7 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 
 				//goTo timeline
 				Player.timeline.goTo('%', Player.Video.el.currentTime/Player.Video.el.duration * 100);
+
 			}
 		})();
 		
@@ -492,8 +520,12 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 
 				if(Player.Video.el.paused) { // paused
 					if(Player.i == 0 || Player.i == null) return;
-					Player.Main.MainModel.prev();
 					var frame = Player.frame();
+					if(parseFloat(Player.Video.el.currentTime) == parseFloat(frame.start))
+						{	
+							Player.Main.MainModel.prev();
+							frame = Player.frame();
+						}
 					Player.Video.el.currentTime = frame.start;
 				} else {  // played
 					var frame = Player.frame();
@@ -588,6 +620,8 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 				Player.Text.Views.LineMain.$el.fadeOut();
 		});
 
+
+
 		//volume
 		(function(){
 			var vol = new timeline(volume[1], volume[0], function(a) {
@@ -596,8 +630,14 @@ function video(video, audio, coords, subs, cpan, tline, volume ) {
 			}, 'prcnts', 0);
 		})();
 
+		//tline 
+		(function() {
+		})();
+
+		//progress
 
 	});//getSubs
+
 	
 	// setInterval(function(){
 	// 	Player.Main.MainModel.changeCounter();
